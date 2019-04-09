@@ -72,8 +72,36 @@ def compatibilityRevision() :
 #  results = getJsonDetections()
 
 import json
-results = getJsonDetections()
-print(json.dumps(results['metadata'], indent=2, sort_keys=True))
+from PIL import Image, ImageDraw
+import numpy as np
+import math
+Image.MAX_IMAGE_PIXELS = 1000000000
+
+def getBoats():
+  results = getJsonDetections()
+  image = Image.open(s1_dir + '/measurement/s1a-iw-grd-vv-20151108t214342-20151108t214407-008519-00c0f6-001.tiff')
+  w, h = image.size
+  minimun_size = 60
+  count = 1
+  for detection in results['detected']:
+    x_pixel = detection['xpixel']
+    y_pixel = detection['ypixel']
+    length = detection['length']
+    width = detection['width']
+    box = (x_pixel - minimun_size, y_pixel - minimun_size, x_pixel + minimun_size, y_pixel + minimun_size) # The crop rectangle, as a (left, upper, right, lower)-tuple
+    cropped_img = image.crop(box)
+    cropped_img.save('new', format='tiff')
+    im = cropped_img.convert('RGBA')
+    draw = ImageDraw.Draw(im)
+    one = minimun_size - max([length, width])
+    two = minimun_size + max([length, width])
+    draw.rectangle(((one, one), (two, two)), outline="#ff8888")
+    im.save('./output/' + str(count) + '_img', format='png')
+    count += 1
+
+
+getBoats()
+""" print(json.dumps(results['metadata'], indent=2, sort_keys=True))
 print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
 image_0 = results['detected'][0]
 print(json.dumps(image_0, indent=2, sort_keys=True))
@@ -86,28 +114,11 @@ lwh_reliability = image_0['lwh_reliability'] # is true if the parameters length,
 length = image_0['length']
 width = image_0['width']
 lon = image_0['lon']
-lat = image_0['lat']
+lat = image_0['lat'] 
 
-from PIL import Image, ImageDraw
-import numpy as np
-import math
+matrix_rotation = np.matrix((math)) """
 
-Image.MAX_IMAGE_PIXELS = 1000000000
-
-image = Image.open(s1_dir + '/measurement/s1a-iw-grd-vv-20151108t214342-20151108t214407-008519-00c0f6-001.tiff')
-w, h = image.size
-minimun_size = 60
-box = (x_pixel - minimun_size, y_pixel - minimun_size, x_pixel + minimun_size, y_pixel + minimun_size) # The crop rectangle, as a (left, upper, right, lower)-tuple
-cropped_img = image.crop(box)
-cropped_img.save('new', format='tiff')
-im = cropped_img.convert('RGBA')
-draw = ImageDraw.Draw(im)
-one = minimun_size - max([length, width])
-two = minimun_size + max([length, width])
-draw.rectangle(((one, one), (two, two)), outline="#ff8888")
-
-matrix_rotation = np.matrix((math))
-
-im.save('test', format='png')
+#results = getJsonDetections()
+#print(json.dumps(results['detected'], indent=2, sort_keys=True))
 
 #def getXYAngle(heading_north, heading_range):
