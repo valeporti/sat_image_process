@@ -100,11 +100,12 @@ def getBoats():
     count += 1
 
 
-getBoats()
-""" print(json.dumps(results['metadata'], indent=2, sort_keys=True))
-print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
+#getBoats()
+results = getJsonDetections()
+#print(json.dumps(results['metadata'], indent=2, sort_keys=True))
+#print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
 image_0 = results['detected'][0]
-print(json.dumps(image_0, indent=2, sort_keys=True))
+#print(json.dumps(image_0, indent=2, sort_keys=True))
 
 x_pixel = image_0['xpixel']
 y_pixel = image_0['ypixel']
@@ -116,9 +117,80 @@ width = image_0['width']
 lon = image_0['lon']
 lat = image_0['lat'] 
 
-matrix_rotation = np.matrix((math)) """
+matrix_rotation = np.matrix((math))
 
-#results = getJsonDetections()
-#print(json.dumps(results['detected'], indent=2, sort_keys=True))
+results = getJsonDetections()
+#print(json.dumps(results['metadata'], indent=2, sort_keys=True))
+#print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
 
 #def getXYAngle(heading_north, heading_range):
+
+
+#*************************************************************************************
+#*************************************************************************************
+#infoImage = results['metadata']
+#infoIntermediaire = results['vds_analysis']
+#infoNavire =  image_0
+#import collection.OrderedDict
+#dictImage = OrderedDict()
+#dictImage = {}
+#dictDet = {}
+#dictImage["ImId"]= infoImage["ImId"]
+#dictImage["image_name"]= infoImage["image_name"] 
+#dictImage["nr_detections"]= infoIntermediaire["nr_detections"]
+#dictDet["ImId"]= infoImage["ImId"]
+#dictDet["lat"]= infoNavire["lat"]
+#dictDet["lon"]= infoNavire["lon"]
+#dictDet["length"]= infoNavire["length"]
+#dictDet["reliability"]= infoNavire["reliability"]
+
+
+
+#client = MongoClient('localhost', 27017)
+#my_db = client["ps4_test_1_May"]
+#tableImage = my_db["Image"]
+#tableImage.insert_one(dictImage)
+#tableDet = my_db["Detection"]
+#tableDet.insert_one(dictDet)
+
+
+import pymongo
+from pymongo import MongoClient
+
+
+def insererInfoImageEtDetectionsSUMO():
+  results = getJsonDetections()
+  infoImage = results['metadata']
+  infoIntermediaire = results['vds_analysis']
+  #infoNavire =  image_0
+  #import collection.OrderedDict
+  #dictImage = OrderedDict()
+  
+  #faire dictionnaire dictImage
+  dictImage = {}
+  dictImage["ImId"]= infoImage["ImId"]
+  dictImage["image_name"]= infoImage["image_name"] 
+  dictImage["nr_detections"]= infoIntermediaire["nr_detections"]
+
+  #connect avec Mongo
+  client = MongoClient('localhost', 27017)
+  my_db = client["ps4_test_1_May"]
+
+  #charge database
+  tableImage = my_db["Image"]
+  tableImage.insert_one(dictImage)
+  
+  for detection in results['detected']:
+    #faire dictionnaire dictDet
+    dictDet = {}
+    dictDet["target_number"]= detection["target_number"]
+    dictDet["lat"]= detection["lat"]
+    dictDet["lon"]= detection["lon"]
+    dictDet["length"]= detection["length"]
+    dictDet["reliability"]= detection["reliability"]
+    dictDet["ImId"]= infoImage["ImId"]
+    #charge database
+    tableImage = my_db["Detection"]
+    tableImage.insert_one(dictDet)
+
+#insererInfoImageEtDetectionsSUMO() 
