@@ -31,7 +31,7 @@ def runSumo():
     shell=True)
 
   
-def getJsonDetections():
+def getJsonDetections(output_dir):
 
   path_xml = ''
   for file in os.listdir(output_dir):
@@ -42,7 +42,6 @@ def getJsonDetections():
   with open(path_xml, 'r') as myfile:
     xml_string = myfile.read().replace('\n', '')
   
-  #bf = BadgerFish(dict_type=OrderedDict, xml_fromstring=True)
   bf = Yahoo(dict_type=OrderedDict, xml_fromstring=True)
   json = loads(dumps(bf.data(fromstring(xml_string))))
 
@@ -68,7 +67,7 @@ def compatibilityRevision() :
 
 
 #if (compatibilityRevision()):
-#  runSumo()
+runSumo()
 #  results = getJsonDetections()
 
 import json
@@ -78,7 +77,7 @@ import math
 Image.MAX_IMAGE_PIXELS = 1000000000
 
 def getBoats():
-  results = getJsonDetections()
+  results = getJsonDetections(output_dir)
   image = Image.open(s1_dir + '/measurement/s1a-iw-grd-vv-20151108t214342-20151108t214407-008519-00c0f6-001.tiff')
   w, h = image.size
   minimun_size = 60
@@ -99,9 +98,9 @@ def getBoats():
     im.save('./output/' + str(count) + '_img', format='png')
     count += 1
 
-
+"""
 #getBoats()
-results = getJsonDetections()
+results = getJsonDetections(output_dir)
 #print(json.dumps(results['metadata'], indent=2, sort_keys=True))
 #print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
 image_0 = results['detected'][0]
@@ -119,7 +118,7 @@ lat = image_0['lat']
 
 matrix_rotation = np.matrix((math))
 
-results = getJsonDetections()
+results = getJsonDetections(output_dir)
 #print(json.dumps(results['metadata'], indent=2, sort_keys=True))
 #print(json.dumps(results['vds_analysis'], indent=2, sort_keys=True))
 
@@ -158,8 +157,8 @@ import pymongo
 from pymongo import MongoClient
 
 
-def insererInfoImageEtDetectionsSUMO():
-  results = getJsonDetections()
+def insererInfoImageEtDetectionsSUMO(output_dir):
+  results = getJsonDetections(output_dir)
   infoImage = results['metadata']
   infoIntermediaire = results['vds_analysis']
   #infoNavire =  image_0
@@ -193,4 +192,5 @@ def insererInfoImageEtDetectionsSUMO():
     tableImage = my_db["Detection"]
     tableImage.insert_one(dictDet)
 
-#insererInfoImageEtDetectionsSUMO() 
+#insererInfoImageEtDetectionsSUMO(output_dir) 
+"""
